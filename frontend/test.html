@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 900px;
+            min-height: 600px;
+            display: flex;
+        }
+
+        .form-container {
+            flex: 1;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-container.login {
+            background: #f8f9ff;
+        }
+
+        .form-container.register {
+            background: white;
+        }
+
+        .toggle-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .toggle-panel {
+            max-width: 300px;
+        }
+
+        .toggle-panel h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .toggle-panel p {
+            margin-bottom: 30px;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .toggle-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 300;
+            font-size: 2.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="file"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #fcc;
+        }
+
+        .success {
+            background: #efe;
+            color: #363;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #cfc;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                max-width: 400px;
+            }
+            
+            .toggle-container {
+                order: -1;
+                padding: 30px;
+            }
+            
+            .form-container {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div class="form-container login" id="loginForm">
+            <h1>Welcome Back</h1>
+            <div id="loginError" class="error hidden"></div>
+            <div id="loginSuccess" class="success hidden"></div>
+            
+            <form id="loginFormElement">
+                <div class="form-group">
+                    <label for="loginIdentifier">Username or Email</label>
+                    <input type="text" id="loginIdentifier" name="identifier" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <span class="btn-text">Sign In</span>
+                    <span class="loading hidden"></span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Toggle Panel -->
+        <div class="toggle-container" id="toggleContainer">
+            <div class="toggle-panel" id="togglePanel">
+                <h2>Hello, Friend!</h2>
+                <p>Register with your personal details to use all features</p>
+                <button class="toggle-btn" id="toggleToRegister">Sign Up</button>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div class="form-container register hidden" id="registerForm">
+            <h1>Create Account</h1>
+            <div id="registerError" class="error hidden"></div>
+            <div id="registerSuccess" class="success hidden"></div>
+            
+            <form id="registerFormElement">
+                <div class="form-group">
+                    <label for="registerFullname">Full Name</label>
+                    <input type="text" id="registerFullname" name="fullName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerUsername">Username</label>
+                    <input type="text" id="registerUsername" name="username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerAvatar">Avatar</label>
+                    <input type="file" id="registerAvatar" name="avatar" accept="image/*" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" name="password" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <span class="btn-text">Sign Up</span>
+                    <span class="loading hidden"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const toggleContainer = document.getElementById('toggleContainer');
+        const togglePanel = document.getElementById('togglePanel');
+        const toggleBtn = document.getElementById('toggleToRegister');
+
+        let isLoginView = true;
+
+        // Toggle between login and register
+        toggleBtn.addEventListener('click', () => {
+            if (isLoginView) {
+                // Switch to register
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                togglePanel.innerHTML = `
+                    <h2>Welcome Back!</h2>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <button class="toggle-btn" id="toggleToLogin">Sign In</button>
+                `;
+                isLoginView = false;
+                
+                // Re-attach event listener
+                document.getElementById('toggleToLogin').addEventListener('click', () => {
+                    registerForm.classList.add('hidden');
+                    loginForm.classList.remove('hidden');
+                    togglePanel.innerHTML = `
+                        <h2>Hello, Friend!</h2>
+                        <p>Register with your personal details to use all features</p>
+                        <button class="toggle-btn" id="toggleToRegister">Sign Up</button>
+                    `;
+                    isLoginView = true;
+                    document.getElementById('toggleToRegister').addEventListener('click', arguments.callee.caller);
+                });
+            }
+        });
+
+        // Login form submission
+        document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = e.target.querySelector('.submit-btn');
+            const btnText = btn.querySelector('.btn-text');
+            const loading = btn.querySelector('.loading');
+            const errorDiv = document.getElementById('loginError');
+            const successDiv = document.getElementById('loginSuccess');
+            
+            // Show loading
+            btn.disabled = true;
+            btnText.textContent = 'Signing In...';
+            loading.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+            
+            const formData = new FormData(e.target);
+            const identifier = formData.get('identifier');
+            
+            // Prepare login data
+            const loginData = {
+                password: formData.get('password')
+            };
+            
+            // Check if identifier is email or username
+            if (identifier.includes('@')) {
+                loginData.email = identifier;
+            } else {
+                loginData.username = identifier;
+            }
+            
+            try {
+                const response = await fetch('/api/v1/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+                
+                // Always try to parse JSON response, even for error responses
+                let result;
+                try {
+                    result = await response.json();
+                } catch (jsonError) {
+                    throw new Error('Server returned invalid response');
+                }
+                
+                if (response.ok) {
+                    successDiv.textContent = result.message || 'Login successful!';
+                    successDiv.classList.remove('hidden');
+                    
+                    // Redirect or handle successful login
+                    setTimeout(() => {
+                        window.location.href = '/dashboard'; // Adjust as needed
+                    }, 1500);
+                } else {
+                    // Handle API errors (like invalid credentials, user not found)
+                    errorDiv.textContent = result.message || `Error ${response.status}: Login failed. Please try again.`;
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                // Only show network error for actual network issues
+                console.error('Login error:', error);
+                errorDiv.textContent = 'Network error. Please check your connection and try again.';
+                errorDiv.classList.remove('hidden');
+            } finally {
+                // Hide loading
+                btn.disabled = false;
+                btnText.textContent = 'Sign In';
+                loading.classList.add('hidden');
+            }
+        });
+
+        // Register form submission
+        document.getElementById('registerFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = e.target.querySelector('.submit-btn');
+            const btnText = btn.querySelector('.btn-text');
+            const loading = btn.querySelector('.loading');
+            const errorDiv = document.getElementById('registerError');
+            const successDiv = document.getElementById('registerSuccess');
+            
+            // Show loading
+            btn.disabled = true;
+            btnText.textContent = 'Creating Account...';
+            loading.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+            
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/api/v1/users/register', {
+                    method: 'POST',
+                    body: formData // Send as FormData for file upload
+                });
+                
+                // Always try to parse JSON response, even for error responses
+                let result;
+                try {
+                    result = await response.json();
+                } catch (jsonError) {
+                    throw new Error('Server returned invalid response');
+                }
+                
+                if (response.ok) {
+                    successDiv.textContent = result.message || 'Registration successful!';
+                    successDiv.classList.remove('hidden');
+                    
+                    // Clear form
+                    e.target.reset();
+                    
+                    // Switch to login after success
+                    setTimeout(() => {
+                        toggleBtn.click();
+                    }, 2000);
+                } else {
+                    // Handle API errors (like user already exists)
+                    errorDiv.textContent = result.message || `Error ${response.status}: Registration failed. Please try again.`;
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                // Only show network error for actual network issues
+                console.error('Registration error:', error);
+                errorDiv.textContent = 'Network error. Please check your connection and try again.';
+                errorDiv.classList.remove('hidden');
+            } finally {
+                // Hide loading
+                btn.disabled = false;
+                btnText.textContent = 'Sign Up';
+                loading.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
