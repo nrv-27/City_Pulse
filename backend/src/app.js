@@ -24,13 +24,13 @@ import notificationRoutes from "./routes/notification.routes.js";
 import aiRoutes from "./routes/ai.routes.js";
 
 //routes declaration
-app.use("/api/users", userRouter);
-app.use("/api/issues", issueRoutes);
-app.use("/api/assignments", assignmentRoutes);
-app.use("/api/feedback", feedbackRoutes);
-app.use("/api/notifications", notificationRoutes);
-app.use("/api/ai", aiRoutes);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/issues", issueRoutes);
+app.use("/api/v1/assignments", assignmentRoutes);
+app.use("/api/v1/feedback", feedbackRoutes);
+app.use("/api/v1/notifications", notificationRoutes);
+app.use("/api/v1/ai", aiRoutes);
 
-// http://localhost:8000/api/v1/users/register
+// http://localhost:3000/api/v1/users/register
 
 export { app }
