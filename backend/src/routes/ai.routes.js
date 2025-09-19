@@ -3,7 +3,7 @@ import {
     verifyIssueAI, 
     getVerificationResult 
 } from "../controllers/ai.controller.js";
-import { verifyJWT, adminOnly } from "../middlewares/auth.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

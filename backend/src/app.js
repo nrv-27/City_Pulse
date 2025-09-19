@@ -24,7 +24,7 @@ import notificationRoutes from "./routes/notification.routes.js";
 import aiRoutes from "./routes/ai.routes.js";
 
 //routes declaration
-app.use("/api/v1/users", userRouter);
+app.use("/api/users", userRouter);
 app.use("/api/issues", issueRoutes);
 app.use("/api/assignments", assignmentRoutes);
 app.use("/api/feedback", feedbackRoutes);

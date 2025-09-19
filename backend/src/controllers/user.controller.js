@@ -5,6 +5,8 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose";
+import { Issue } from "../models/issue.model.js";
+import { Assignment } from "../models/assignment.model.js";
 
 
 const generateAccessAndRefereshTokens = async(userId) =>{
@@ -480,6 +482,19 @@ const getWatchHistory = asyncHandler(async(req, res) => {
     )
 })
 
+const getMyReportedIssues = asyncHandler(async (req, res) => {
+  const issues = await Issue.find({ userId: req.user._id }).populate("media");
+  return res.status(200).json(new ApiResponse(200, issues, "Reported issues fetched"));
+});
+
+// ✅ Fetch all assignments for current worker
+const getMyAssignments = asyncHandler(async (req, res) => {
+  const assignments = await Assignment.find({ assignedTo: req.user._id })
+    .populate("issueId")
+    .populate("assignedBy", "fullName role");
+  return res.status(200).json(new ApiResponse(200, assignments, "Assignments fetched"));
+});
+
 
 export {
     registerUser,
@@ -492,5 +507,7 @@ export {
     updateUserAvatar,
     updateUserCoverImage,
     getUserChannelProfile,
-    getWatchHistory
+    getWatchHistory,
+    getMyReportedIssues,
+    getMyAssignments
 }
