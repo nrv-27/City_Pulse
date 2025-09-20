@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue Map - CivicReporter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        #map { height: calc(100vh - 64px); }
+        .custom-popup .leaflet-popup-content-wrapper {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .filter-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-indigo-600">
+                            <i class="fas fa-city mr-2"></i>City Pulse
+                        </h1>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="index.html" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Home</a>
+                        <!-- <a href="report.html" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Report Issue</a> -->
+                        <a href="map.html" class="text-indigo-600 border-b-2 border-indigo-600 px-1 pt-1 text-sm font-medium">Issue Map</a>
+                        <a href="campaigns.html" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Campaigns</a>
+                        <a href="leaderboard.html" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Leaderboard</a>
+                        <a href="admin.html" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Admin</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm">
+                        <span class="text-gray-600">Points: </span>
+                        <span id="userPoints" class="font-semibold text-indigo-600">2,850</span>
+                        <span class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Gold</span>
+                    </div>
+                    <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1494790108755-2616b612b55c?w=150" alt="Profile">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-16 relative">
+        <!-- Floating Filter Panel -->
+        <div class="absolute top-4 left-4 z-40 filter-card p-4 rounded-xl shadow-lg max-w-sm">
+            <h3 class="font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-filter mr-2 text-indigo-600"></i>
+                Filters & Stats
+            </h3>
+            
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="text-center p-3 bg-white rounded-lg shadow-sm">
+                    <div class="text-lg font-bold text-indigo-600" id="totalIssues">5</div>
+                    <div class="text-xs text-gray-600">Total Issues</div>
+                </div>
+                <div class="text-center p-3 bg-white rounded-lg shadow-sm">
+                    <div class="text-lg font-bold text-green-600" id="resolvedIssues">1</div>
+                    <div class="text-xs text-gray-600">Resolved</div>
+                </div>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <select id="categoryFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    <option value="">All Categories</option>
+                    <option value="Roads">Roads</option>
+                    <option value="Water">Water</option>
+                    <option value="Electricity">Electricity</option>
+                    <option value="Waste Management">Waste Management</option>
+                    <option value="Environment">Environment</option>
+                    <option value="Public Safety">Public Safety</option>
+                </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                <div class="space-y-2">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="status-checkbox" value="pending" checked 
+                               class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="ml-2 text-sm text-gray-700">Pending</span>
+                        <span class="ml-auto w-3 h-3 bg-gray-400 rounded-full"></span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="status-checkbox" value="verified" checked 
+                               class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="ml-2 text-sm text-gray-700">Verified</span>
+                        <span class="ml-auto w-3 h-3 bg-blue-500 rounded-full"></span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="status-checkbox" value="in_progress" checked 
+                               class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="ml-2 text-sm text-gray-700">In Progress</span>
+                        <span class="ml-auto w-3 h-3 bg-orange-500 rounded-full"></span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="status-checkbox" value="resolved" checked 
+                               class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="ml-2 text-sm text-gray-700">Resolved</span>
+                        <span class="ml-auto w-3 h-3 bg-green-500 rounded-full"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Severity Filter -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Min Severity</label>
+                <select id="severityFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    <option value="">All Severities</option>
+                    <option value="low">Low & Above</option>
+                    <option value="medium">Medium & Above</option>
+                    <option value="high">High & Critical</option>
+                    <option value="critical">Critical Only</option>
+                </select>
+            </div>
+
+            <button id="refreshMap" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-indigo-700 transition duration-200">
+                <i class="fas fa-sync-alt mr-2"></i>Refresh Map
+            </button>
+        </div>
+
+        <!-- Map Legend -->
+        <div class="absolute top-4 right-4 z-40 filter-card p-4 rounded-xl shadow-lg">
+            <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+                <i class="fas fa-map-signs mr-2 text-indigo-600"></i>
+                Legend
+            </h3>
+            
+            <div class="space-y-2 text-sm">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-gray-500 rounded-full mr-3"></div>
+                    <span>Pending</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-blue-500 rounded-full mr-3"></div>
+                    <span>Verified</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-orange-500 rounded-full mr-3"></div>
+                    <span>In Progress</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-green-500 rounded-full mr-3"></div>
+                    <span>Resolved</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-red-500 rounded-full mr-3"></div>
+                    <span>Critical</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Issue Details Panel (Hidden by default) -->
+        <div id="issuePanel" class="hidden absolute bottom-0 left-0 right-0 z-40 bg-white shadow-2xl rounded-t-2xl p-6 max-h-96 overflow-y-auto">
+            <div class="flex justify-between items-start mb-4">
+                <h3 id="issuePanelTitle" class="text-xl font-bold text-gray-900"></h3>
+                <button id="closePanel" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="issuePanelContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Main Map Container -->
+        <div id="map"></div>
+
+        <!-- Floating Action Button -->
+        <div class="fixed bottom-6 right-6 z-40">
+            <a href="report.html" 
+               class="bg-indigo-600 text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center hover:bg-indigo-700 transform hover:scale-110 transition duration-200">
+                <i class="fas fa-plus text-xl"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <script src="js/map.js"></script>
+</body>
+</html>
