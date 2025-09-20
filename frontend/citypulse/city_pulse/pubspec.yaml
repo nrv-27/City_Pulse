@@ -1,27 +1,29 @@
 name: city_pulse
-description: A new Flutter project.
+description: Crowdsourced Civic Issue Reporting App
+
 publish_to: 'none'
 
-version: 1.0.0+1
-
 environment:
-  sdk: ^3.7.2
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
+  flutter_map_marker_popup: ^8.1.0
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.5
-  image_picker: ^1.1.0
+  image_picker: ^0.8.7+4
   dio: ^5.9.0
   flutter_map: ^8.2.1
   latlong2: ^0.9.1
   table_calendar: ^3.0.9
   geolocator: ^14.0.2
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/  # include this if you have any images

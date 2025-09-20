@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'screens/login_screen.dart';  // import the login screen
+import 'screens/login_screen.dart';
+// import 'screens/home_screen.dart';  // Example future screen
+// import 'screens/issue_report_screen.dart'; // Example
 
 void main() {
   runApp(const MyApp());
@@ -13,11 +15,32 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'CityPulse',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 51, 131, 55)), // green theme
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF338337), // Green theme seed
+          brightness: Brightness.light,
+        ),
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          bodyMedium: TextStyle(fontSize: 16),
+          titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF338337),
+          foregroundColor: Colors.white,
+          centerTitle: true,
+          elevation: 4,
+        ),
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(), // start with login screen
+
+      // ✅ Centralized route system
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        // '/home': (context) => const HomeScreen(),
+        // '/report': (context) => const IssueReportScreen(),
+      },
     );
   }
 }
