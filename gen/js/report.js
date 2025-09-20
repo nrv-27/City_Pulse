@@ -420,3 +420,4 @@ class ReportManager {
 document.addEventListener('DOMContentLoaded', () => {
     new ReportManager();
 });
+
