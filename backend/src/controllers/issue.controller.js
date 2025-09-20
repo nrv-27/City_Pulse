@@ -2,22 +2,15 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Issue } from "../models/issue.model.js";
+import { IssueMedia } from "../models/issue_media.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
-//  Citizen creates issue
+// Citizen creates issue
 const createIssue = asyncHandler(async (req, res) => {
   const { title, description, category, lat, lng, address } = req.body;
 
   if (!title || !category || !lat || !lng) {
     throw new ApiError(400, "Missing required fields");
-  }
-
-  const mediaUploads = [];
-  if (req.files?.length > 0) {
-    for (const file of req.files) {
-      const uploaded = await uploadOnCloudinary(file.path);
-      mediaUploads.push({ fileUrl: uploaded.url, mediaType: "image" });
-    }
   }
 
   const issue = await Issue.create({
@@ -27,29 +20,59 @@ const createIssue = asyncHandler(async (req, res) => {
     category,
     location: { lat, lng },
     address,
-    media: mediaUploads
+    media: []
   });
 
-  return res.status(201).json(new ApiResponse(201, issue, "Issue reported successfully"));
+  // Upload files to Cloudinary and save in IssueMedia
+  const mediaIds = [];
+  if (req.files?.length > 0) {
+    for (const file of req.files) {
+      const uploaded = await uploadOnCloudinary(file.path);
+
+      const mediaDoc = await IssueMedia.create({
+        issueId: issue._id,
+        fileUrl: uploaded.url,
+        mediaType: file.mimetype.startsWith("video") ? "video" : "image"
+      });
+
+      mediaIds.push(mediaDoc._id);
+    }
+
+    // Update issue with media IDs
+    issue.media = mediaIds;
+    await issue.save();
+  }
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, issue, "Issue reported successfully"));
 });
 
-//  Get all issues (admin dashboard)
+// Get all issues (admin dashboard)
 const getAllIssues = asyncHandler(async (req, res) => {
-  const issues = await Issue.find().populate("userId", "fullName role");
+  const issues = await Issue.find()
+    .populate("userId", "fullName role")
+    .populate("media"); // populate media objects
   return res.status(200).json(new ApiResponse(200, issues, "All issues fetched"));
 });
 
-//  Get single issue
+// Get single issue
 const getIssueById = asyncHandler(async (req, res) => {
-  const issue = await Issue.findById(req.params.id).populate("userId", "fullName role");
+  const issue = await Issue.findById(req.params.id)
+    .populate("userId", "fullName role")
+    .populate("media"); // populate media objects
   if (!issue) throw new ApiError(404, "Issue not found");
   return res.status(200).json(new ApiResponse(200, issue, "Issue fetched"));
 });
 
-//  Update issue status
+// Update issue status
 const updateIssueStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
-  const issue = await Issue.findByIdAndUpdate(req.params.id, { status }, { new: true });
+  const issue = await Issue.findByIdAndUpdate(
+    req.params.id,
+    { status },
+    { new: true }
+  );
   if (!issue) throw new ApiError(404, "Issue not found");
   return res.status(200).json(new ApiResponse(200, issue, "Issue status updated"));
 });

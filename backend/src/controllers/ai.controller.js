@@ -2,66 +2,99 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { AIVerification } from "../models/aiVerification.model.js";
-import { Issue } from "../models/issue.model.js"; // 💡 Assuming you have an Issue model to get the image URL
+import { Issue } from "../models/issue.model.js";
+import { IssueMedia } from "../models/issue_media.model.js"; 
+import { User } from "../models/user.model.js";
 import { ImageAnnotatorClient } from "@google-cloud/vision";
 
 // Initialize the Google Vision Client
 const visionClient = new ImageAnnotatorClient();
 
 /**
- * 💡 IMPORTANT: Model Update
- * Your AIVerification model should be updated to store the tags.
- * * export const aiVerificationSchema = new Schema({
- * issueId: { type: Schema.Types.ObjectId, ref: "Issue", required: true, index: true },
- * verified: { type: Boolean, default: false },
- * confidenceScore: { type: Number },
- * tags: { type: [String] } // ✨ Add this field to your schema
- * }, { timestamps: true });
+ * Verify issue images using Google Vision API and auto-tag them.
+ * Adds points to the user upon successful verification.
  */
-
-
-//  Run AI verification and auto-tagging using Google Vision API
 const verifyIssueAI = asyncHandler(async (req, res) => {
     const { issueId } = req.params;
 
-    // 1. Fetch the issue to get the image URL
+    const existingVerification = await AIVerification.findOne({ issueId });
+    if (existingVerification && existingVerification.verified) {
+        return res.status(200).json(new ApiResponse(
+            200,
+            existingVerification,
+            "Issue already verified. No action taken."
+        ));
+    }
+
+    // Check if the issue exists
     const issue = await Issue.findById(issueId);
-    if (!issue || !issue.imageUrl) {
-        throw new ApiError(404, "Issue or issue image not found");
+    if (!issue) {
+        throw new ApiError(404, "Issue not found");
     }
 
-    // 2. Call Google Vision API for label detection (auto-tagging)
-    const [result] = await visionClient.labelDetection(issue.imageUrl);
-    const labels = result.labelAnnotations;
-
-    if (!labels || labels.length === 0) {
-        throw new ApiError(500, "AI could not verify the image.");
+    // Fetch related media directly from IssueMedia collection
+    const mediaItems = await IssueMedia.find({ issueId });
+    if (!mediaItems || mediaItems.length === 0) {
+        throw new ApiError(404, "No media found for this issue");
     }
-    
-    // 3. Process the results
-    const tags = labels.map(label => label.description.toLowerCase());
-    const primaryLabel = labels[0]; // The first label is usually the most confident one
 
-    // 4. Create or update the verification document in the database
-    // Using findOneAndUpdate with upsert is robust: it creates if not exists, updates if it does.
+    // Array to hold verification results for all media
+    const allMediaResults = [];
+
+    // Process each media item
+    for (const media of mediaItems) {
+        const imageUrl = media.fileUrl;
+
+        // Call Google Vision API for label detection
+        const [result] = await visionClient.labelDetection(imageUrl);
+        const labels = result.labelAnnotations;
+
+        if (!labels || labels.length === 0) continue; // skip if no labels
+
+        const tags = labels.map(label => label.description.toLowerCase());
+        const primaryLabel = labels[0];
+
+        allMediaResults.push({
+            mediaId: media._id,
+            url: imageUrl,
+            confidenceScore: Math.round(primaryLabel.score * 100),
+            tags: tags.slice(0, 5)
+        });
+    }
+
+    if (allMediaResults.length === 0) {
+        throw new ApiError(500, "AI could not verify any media for this issue.");
+    }
+
+    // Store or update AI verification in DB (one document per issue)
     const verification = await AIVerification.findOneAndUpdate(
-        { issueId: issueId },
+        { issueId },
         {
             issueId,
             verified: true,
-            confidenceScore: Math.round(primaryLabel.score * 100), // Convert score (0-1) to percentage (0-100)
-            tags: tags.slice(0, 5) // Store the top 5 relevant tags
+            mediaResults: allMediaResults
         },
-        { new: true, upsert: true } // `upsert: true` creates a new doc if none is found
+        { new: true, upsert: true }
     );
 
-    return res
-        .status(201)
-        .json(new ApiResponse(201, verification, "AI verification and tagging completed successfully"));
+    // Add points to the user after successful AI verification
+    const pointsToAdd = 50;
+    const user = await User.findById(req.user._id);
+    if (user) {
+        user.points = (user.points || 0) + pointsToAdd;
+        await user.save();
+    }
+
+    return res.status(201).json(new ApiResponse(
+        201,
+        { verification, pointsAdded: pointsToAdd },
+        "AI verification and tagging completed successfully, points added"
+    ));
 });
 
-
-//  Get AI result
+/**
+ * Get AI verification result for an issue
+ */
 const getVerificationResult = asyncHandler(async (req, res) => {
     const { issueId } = req.params;
     const verification = await AIVerification.findOne({ issueId });
@@ -70,9 +103,11 @@ const getVerificationResult = asyncHandler(async (req, res) => {
         throw new ApiError(404, "No verification result found for this issue");
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, verification, "AI verification result fetched successfully"));
+    return res.status(200).json(new ApiResponse(
+        200,
+        verification,
+        "AI verification result fetched successfully"
+    ));
 });
 
 export { verifyIssueAI, getVerificationResult };
