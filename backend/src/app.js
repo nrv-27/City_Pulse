@@ -25,12 +25,12 @@ import aiRoutes from "./routes/ai.routes.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/issues", issueRoutes);
-app.use("/api/v1/assignments", assignmentRoutes);
+app.use("/api/v1/issue", issueRoutes);
+app.use("/api/v1/assignment", assignmentRoutes);
 app.use("/api/v1/feedback", feedbackRoutes);
-app.use("/api/v1/notifications", notificationRoutes);
+app.use("/api/v1/notification", notificationRoutes);
 app.use("/api/v1/ai", aiRoutes);
 
-// http://localhost:3000/api/v1/users/register
+// http://localhost:3000/api/v1/
 
 export { app }

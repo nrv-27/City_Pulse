@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - CivicReporter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .leaderboard-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .leaderboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .trophy-gradient {
+            background: linear-gradient(135deg, #ffd700, #ffed4a, #f59e0b);
+        }
+        .silver-gradient {
+            background: linear-gradient(135deg, #e5e7eb, #d1d5db, #9ca3af);
+        }
+        .bronze-gradient {
+            background: linear-gradient(135deg, #cd7f32, #b45309, #92400e);
+        }
+        .level-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .points-animation {
+            animation: pointsPulse 2s infinite;
+        }
+        @keyframes pointsPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-indigo-600">
+                            <i class="fas fa-city mr-2"></i>City Pulse
+                        </h1>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="index.html" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Home</a>
+                        <!-- <a href="report.html" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Report Issue</a> -->
+                        <a href="map.html" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Issue Map</a>
+                        <a href="campaigns.html" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Campaigns</a>
+                        <a href="leaderboard.html" class="text-indigo-600 border-b-2 border-indigo-600 px-1 pt-1 text-sm font-medium">Leaderboard</a>
+                        <a href="admin.html" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">Admin</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm">
+                        <span class="text-gray-600">Points: </span>
+                        <span id="userPoints" class="font-semibold text-indigo-600 points-animation">2,850</span>
+                        <span class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Gold</span>
+                    </div>
+                    <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1494790108755-2616b612b55c?w=150" alt="Profile">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-20 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-trophy text-yellow-500 mr-4"></i>
+                    Community Leaderboard
+                </h1>
+                <p class="text-xl text-gray-600">Celebrating our top civic champions and community contributors</p>
+            </div>
+
+            <!-- User Profile Card -->
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-8 rounded-2xl mb-8 shadow-xl">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-6">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b55c?w=150" 
+                             alt="Profile" class="w-20 h-20 rounded-full border-4 border-white">
+                        <div>
+                            <h2 class="text-2xl font-bold">Priya Sharma</h2>
+                            <p class="text-indigo-100">Gold Level Contributor</p>
+                            <div class="flex items-center space-x-4 mt-2">
+                                <span class="flex items-center">
+                                    <i class="fas fa-medal mr-2"></i>Rank #3
+                                </span>
+                                <span class="flex items-center">
+                                    <i class="fas fa-calendar mr-2"></i>Member since Jan 2024
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-4xl font-bold points-animation">2,850</div>
+                        <div class="text-indigo-100">Total Points</div>
+                        <div class="mt-4 space-y-1 text-sm">
+                            <div>📋 12 Reports Submitted</div>
+                            <div>✅ 8 Reports Verified</div>
+                            <div>🎯 5 Campaigns Joined</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard Categories -->
+            <div class="mb-8">
+                <div class="flex flex-wrap gap-4 justify-center">
+                    <button class="leaderboard-tab bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold" data-tab="overall">
+                        <i class="fas fa-trophy mr-2"></i>Overall
+                    </button>
+                    <button class="leaderboard-tab bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold" data-tab="monthly">
+                        <i class="fas fa-calendar mr-2"></i>This Month
+                    </button>
+                    <button class="leaderboard-tab bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold" data-tab="reporters">
+                        <i class="fas fa-bullhorn mr-2"></i>Top Reporters
+                    </button>
+                    <button class="leaderboard-tab bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold" data-tab="volunteers">
+                        <i class="fas fa-hands-helping mr-2"></i>Top Volunteers
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Top 3 Podium -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-8 text-center">🏆 Top Champions</h2>
+                        
+                        <!-- Podium Design -->
+                        <div class="flex items-end justify-center space-x-4 mb-8">
+                            <!-- 2nd Place -->
+                            <div class="text-center">
+                                <div class="bg-gray-100 p-6 rounded-xl mb-4 transform -translate-y-4">
+                                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b55c?w=100" 
+                                         alt="2nd Place" class="w-16 h-16 rounded-full mx-auto mb-3">
+                                    <div class="font-bold text-gray-900">Priya Sharma</div>
+                                    <div class="text-gray-600 text-sm">Gold Level</div>
+                                    <div class="text-2xl font-bold text-gray-600 mt-2">2,850</div>
+                                </div>
+                                <div class="silver-gradient text-white py-3 px-4 rounded-lg font-bold">
+                                    <i class="fas fa-medal mr-2"></i>2nd
+                                </div>
+                            </div>
+
+                            <!-- 1st Place (Highest) -->
+                            <div class="text-center">
+                                <div class="bg-yellow-50 p-8 rounded-xl mb-4">
+                                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100" 
+                                         alt="1st Place" class="w-20 h-20 rounded-full mx-auto mb-3 border-4 border-yellow-400">
+                                    <div class="font-bold text-gray-900 text-lg">Rajesh Kumar</div>
+                                    <div class="text-gray-600">Platinum Level</div>
+                                    <div class="text-3xl font-bold text-yellow-600 mt-2">4,200</div>
+                                </div>
+                                <div class="trophy-gradient text-white py-4 px-6 rounded-lg font-bold text-lg">
+                                    <i class="fas fa-crown mr-2"></i>1st
+                                </div>
+                            </div>
+
+                            <!-- 3rd Place -->
+                            <div class="text-center">
+                                <div class="bg-orange-50 p-6 rounded-xl mb-4 transform translate-y-2">
+                                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100" 
+                                         alt="3rd Place" class="w-16 h-16 rounded-full mx-auto mb-3">
+                                    <div class="font-bold text-gray-900">Sneha Reddy</div>
+                                    <div class="text-gray-600 text-sm">Gold Level</div>
+                                    <div class="text-2xl font-bold text-orange-600 mt-2">3,150</div>
+                                </div>
+                                <div class="bronze-gradient text-white py-3 px-4 rounded-lg font-bold">
+                                    <i class="fas fa-medal mr-2"></i>3rd
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Full Leaderboard -->
+                    <div class="bg-white rounded-2xl shadow-xl p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-6">Complete Rankings</h3>
+                        
+                        <div class="space-y-3" id="leaderboardList">
+                            <!-- Rankings will be loaded here -->
+                        </div>
+
+                        <div class="text-center mt-6">
+                            <button class="text-indigo-600 hover:text-indigo-700 font-medium">
+                                View More Rankings →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Sidebar -->
+                <div class="space-y-6">
+                    <!-- Level Progress -->
+                    <div class="bg-white rounded-2xl shadow-xl p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">
+                            <i class="fas fa-chart-line text-indigo-600 mr-2"></i>
+                            Your Progress
+                        </h3>
+                        
+                        <div class="text-center mb-6">
+                            <div class="level-badge text-white px-4 py-2 rounded-full inline-block font-semibold mb-4">
+                                Gold Level
+                            </div>
+                            <div class="text-2xl font-bold text-gray-900">2,850 / 4,000</div>
+                            <div class="text-gray-600 text-sm">Points to Platinum</div>
+                        </div>
+
+                        <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                            <div class="bg-gradient-to-r from-yellow-400 to-yellow-600 h-3 rounded-full" style="width: 71.25%"></div>
+                        </div>
+
+                        <div class="text-center text-sm text-gray-600">
+                            <span class="font-semibold text-indigo-600">1,150 points</span> to next level!
+                        </div>
+                    </div>
+
+                    <!-- Points Breakdown Chart -->
+                    <div class="bg-white rounded-2xl shadow-xl p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">
+                            <i class="fas fa-chart-pie text-purple-600 mr-2"></i>
+                            Points Breakdown
+                        </h3>
+                        
+                        <div class="relative" style="height: 200px;">
+                            <canvas id="pointsChart"></canvas>
+                        </div>
+
+                        <div class="mt-4 space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="flex items-center">
+                                    <div class="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+                                    Reports Submitted
+                                </span>
+                                <span class="font-semibold">600 pts</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="flex items-center">
+                                    <div class="w-3 h-3 bg-green-500 rounded mr-2"></div>
+                                    Reports Verified
+                                </span>
+                                <span class="font-semibold">200 pts</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="flex items-center">
+                                    <div class="w-3 h-3 bg-purple-500 rounded mr-2"></div>
+                                    Campaigns Joined
+                                </span>
+                                <span class="font-semibold">750 pts</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="flex items-center">
+                                    <div class="w-3 h-3 bg-orange-500 rounded mr-2"></div>
+                                    Community Votes
+                                </span>
+                                <span class="font-semibold">150 pts</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Achievements -->
+                    <div class="bg-white rounded-2xl shadow-xl p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">
+                            <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+                            Recent Achievements
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center p-3 bg-yellow-50 rounded-lg">
+                                <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-star text-white"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-900">First Report</div>
+                                    <div class="text-sm text-gray-600">Submitted your first civic report</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-users text-white"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-900">Community Helper</div>
+                                    <div class="text-sm text-gray-600">Verified 5+ community reports</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                                <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-calendar-check text-white"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-900">Campaign Champion</div>
+                                    <div class="text-sm text-gray-600">Participated in 5 campaigns</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button class="text-indigo-600 hover:text-indigo-700 font-medium text-sm">
+                                View All Achievements →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Level System Info -->
+                    <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl shadow-xl p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">
+                            <i class="fas fa-info-circle text-indigo-600 mr-2"></i>
+                            Level System
+                        </h3>
+                        
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="flex items-center">
+                                    <div class="w-3 h-3 bg-gray-400 rounded mr-2"></div>
+                                    Bronze
+                                </span>
+                                <span class="text-gray-600">0 - 999 pts</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="flex items-center">
+                                    <div class="w-3 h-3 bg-gray-500 rounded mr-2"></div>
+                                    Silver
+                                </span>
+                                <span class="text-gray-600">1,000 - 1,999 pts</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="flex items-center">
+                                    <div class="w-3 h-3 bg-yellow-500 rounded mr-2"></div>
+                                    Gold
+                                </span>
+                                <span class="text-gray-600">2,000 - 3,999 pts</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="flex items-center">
+                                    <div class="w-3 h-3 bg-purple-500 rounded mr-2"></div>
+                                    Platinum
+                                </span>
+                                <span class="text-gray-600">4,000 - 6,999 pts</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="flex items-center">
+                                    <div class="w-3 h-3 bg-blue-600 rounded mr-2"></div>
+                                    Diamond
+                                </span>
+                                <span class="text-gray-600">7,000+ pts</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/leaderboard.js"></script>
+</body>
+</html>

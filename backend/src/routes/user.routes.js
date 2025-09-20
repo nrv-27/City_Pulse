@@ -39,12 +39,8 @@ router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/update-account").patch(verifyJWT, updateAccountDetails);
 
-// ✅ Avatar & Cover Image Updates
-router.route("/avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
-router.route("/cover-image").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
-
 // ✅ Civic-Specific
-router.route("/my-issues").get(verifyJWT, getMyReportedIssues);   // citizen’s reported issues
-router.route("/my-assignments").get(verifyJWT, getMyAssignments); // worker/contractor’s assigned tasks
+router.route("/issue").get(verifyJWT, getMyReportedIssues);   // citizen’s reported issues
+router.route("/assignment").get(verifyJWT, getMyAssignments); // worker/contractor’s assigned tasks
 
 export default router;
