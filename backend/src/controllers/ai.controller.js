@@ -2,99 +2,105 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { AIVerification } from "../models/aiVerification.model.js";
-import { Issue } from "../models/issue.model.js";
-import { IssueMedia } from "../models/issue_media.model.js"; 
-import { User } from "../models/user.model.js";
+import { Issue } from "../models/issue.model.js"; 
+import { User } from "../models/user.model.js"; 
 import { ImageAnnotatorClient } from "@google-cloud/vision";
 
-// Initialize the Google Vision Client
+// Initialize Google Vision Client
 const visionClient = new ImageAnnotatorClient();
 
-/**
- * Verify issue images using Google Vision API and auto-tag them.
- * Adds points to the user upon successful verification.
- */
+// Predefined keywords for verification
+const VALID_TAGS = [
+  // Waste management
+  "garbage", "trash", "waste", "litter", "dumping", "overflowing bin",
+
+  // Road & Transport
+  "pothole", "road damage", "broken sidewalk", "blocked road", "traffic light not working", "damaged signboard",
+
+  // Water & Sanitation
+  "sewage", "open drain", "waterlogging", "leakage", "broken pipeline",
+
+  // Electricity
+  "streetlight not working", "electrical hazard", "exposed wires", "power outage",
+
+  // Environment
+  "illegal construction", "deforestation", "pollution", "burning waste",
+
+  // Public Safety
+  "vandalism", "graffiti", "illegal parking", "encroachment", "broken fence",
+
+  // Public Facilities
+  "park maintenance", "broken bench", "damaged playground", "public toilet issue"
+];
+
+
 const verifyIssueAI = asyncHandler(async (req, res) => {
     const { issueId } = req.params;
 
-    const existingVerification = await AIVerification.findOne({ issueId });
-    if (existingVerification && existingVerification.verified) {
-        return res.status(200).json(new ApiResponse(
-            200,
-            existingVerification,
-            "Issue already verified. No action taken."
-        ));
+    // Fetch issue from DB
+    const issue = await Issue.findById(issueId).populate("media");
+    if (!issue || !issue.media || issue.media.length === 0) {
+        throw new ApiError(404, "Issue or issue media not found");
     }
 
-    // Check if the issue exists
-    const issue = await Issue.findById(issueId);
-    if (!issue) {
-        throw new ApiError(404, "Issue not found");
+    // Check if already verified
+    let existingVerification = await AIVerification.findOne({ issueId });
+    if (existingVerification?.verified) {
+        return res.status(200).json(
+            new ApiResponse(200, existingVerification, "Issue already verified earlier")
+        );
     }
 
-    // Fetch related media directly from IssueMedia collection
-    const mediaItems = await IssueMedia.find({ issueId });
-    if (!mediaItems || mediaItems.length === 0) {
-        throw new ApiError(404, "No media found for this issue");
+    const imageUrl = issue.media[0].fileUrl;
+    const description = issue.description?.toLowerCase() || "";
+
+    // Call Google Vision API
+    const [result] = await visionClient.labelDetection(imageUrl);
+    const labels = result.labelAnnotations || [];
+
+    if (labels.length === 0) {
+        throw new ApiError(500, "AI could not analyze the image.");
     }
 
-    // Array to hold verification results for all media
-    const allMediaResults = [];
+    // Extract AI tags
+    const tags = labels.map(label => label.description.toLowerCase());
 
-    // Process each media item
-    for (const media of mediaItems) {
-        const imageUrl = media.fileUrl;
+    // Match description with AI tags
+    const matchedTag = tags.find(
+        tag => VALID_TAGS.includes(tag) &&
+        (description.includes(tag) || description.includes("waste") || description.includes("garbage"))
+    );
 
-        // Call Google Vision API for label detection
-        const [result] = await visionClient.labelDetection(imageUrl);
-        const labels = result.labelAnnotations;
+    const verified = matchedTag ? true : false;
 
-        if (!labels || labels.length === 0) continue; // skip if no labels
-
-        const tags = labels.map(label => label.description.toLowerCase());
-        const primaryLabel = labels[0];
-
-        allMediaResults.push({
-            mediaId: media._id,
-            url: imageUrl,
-            confidenceScore: Math.round(primaryLabel.score * 100),
-            tags: tags.slice(0, 5)
-        });
-    }
-
-    if (allMediaResults.length === 0) {
-        throw new ApiError(500, "AI could not verify any media for this issue.");
-    }
-
-    // Store or update AI verification in DB (one document per issue)
+    // Save verification result
     const verification = await AIVerification.findOneAndUpdate(
         { issueId },
         {
             issueId,
-            verified: true,
-            mediaResults: allMediaResults
+            verified,
+            confidenceScore: Math.round((labels[0].score || 0) * 100),
+            tags: tags.slice(0, 5)
         },
         { new: true, upsert: true }
     );
 
-    // Add points to the user after successful AI verification
-    const pointsToAdd = 50;
-    const user = await User.findById(req.user._id);
-    if (user) {
-        user.points = (user.points || 0) + pointsToAdd;
-        await user.save();
+    // If verified and first time → award points
+    if (verified && (!existingVerification || !existingVerification.verified)) {
+        const user = await User.findById(issue.userId);
+        if (user) {
+            user.points = (user.points || 0) + 50;
+            await user.save();
+        }
     }
 
-    return res.status(201).json(new ApiResponse(
-        201,
-        { verification, pointsAdded: pointsToAdd },
-        "AI verification and tagging completed successfully, points added"
-    ));
+    return res.status(201).json(
+        new ApiResponse(201, { verification, tags }, verified 
+            ? "AI + description verified issue and points awarded" 
+            : "Verification failed (AI and description did not match)")
+    );
 });
 
-/**
- * Get AI verification result for an issue
- */
 const getVerificationResult = asyncHandler(async (req, res) => {
     const { issueId } = req.params;
     const verification = await AIVerification.findOne({ issueId });
@@ -103,11 +109,9 @@ const getVerificationResult = asyncHandler(async (req, res) => {
         throw new ApiError(404, "No verification result found for this issue");
     }
 
-    return res.status(200).json(new ApiResponse(
-        200,
-        verification,
-        "AI verification result fetched successfully"
-    ));
+    return res
+        .status(200)
+        .json(new ApiResponse(200, verification, "AI verification result fetched successfully"));
 });
 
 export { verifyIssueAI, getVerificationResult };
