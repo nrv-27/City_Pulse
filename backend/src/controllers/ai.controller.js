@@ -2,35 +2,35 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { AIVerification } from "../models/aiVerification.model.js";
-import { Issue } from "../models/issue.model.js"; 
-import { User } from "../models/user.model.js"; 
+import { Issue } from "../models/issue.model.js";
+import { User } from "../models/user.model.js";
 import { ImageAnnotatorClient } from "@google-cloud/vision";
 
 // Initialize Google Vision Client
 const visionClient = new ImageAnnotatorClient();
 
-// Predefined keywords for verification
+//  Predefined keywords for verification
 const VALID_TAGS = [
-  // Waste management
-  "garbage", "trash", "waste", "litter", "dumping", "overflowing bin",
+    // Waste management
+    "garbage", "trash", "waste", "litter", "dumping", "overflowing bin",
 
-  // Road & Transport
-  "pothole", "road damage", "broken sidewalk", "blocked road", "traffic light not working", "damaged signboard",
+    // Road & Transport
+    "pothole", "road damage", "broken sidewalk", "blocked road", "traffic light not working", "damaged signboard",
 
-  // Water & Sanitation
-  "sewage", "open drain", "waterlogging", "leakage", "broken pipeline",
+    // Water & Sanitation
+    "sewage", "open drain", "waterlogging", "leakage", "broken pipeline",
 
-  // Electricity
-  "streetlight not working", "electrical hazard", "exposed wires", "power outage",
+    // Electricity
+    "streetlight not working", "electrical hazard", "exposed wires", "power outage",
 
-  // Environment
-  "illegal construction", "deforestation", "pollution", "burning waste",
+    // Environment
+    "illegal construction", "deforestation", "pollution", "burning waste",
 
-  // Public Safety
-  "vandalism", "graffiti", "illegal parking", "encroachment", "broken fence",
+    // Public Safety
+    "vandalism", "graffiti", "illegal parking", "encroachment", "broken fence",
 
-  // Public Facilities
-  "park maintenance", "broken bench", "damaged playground", "public toilet issue"
+    // Public Facilities
+    "park maintenance", "broken bench", "damaged playground", "public toilet issue"
 ];
 
 
@@ -47,7 +47,7 @@ const verifyIssueAI = asyncHandler(async (req, res) => {
     let existingVerification = await AIVerification.findOne({ issueId });
     if (existingVerification?.verified) {
         return res.status(200).json(
-            new ApiResponse(200, existingVerification, "Issue already verified earlier")
+            new ApiResponse(200, existingVerification, "✅ Issue already verified earlier")
         );
     }
 
@@ -68,7 +68,7 @@ const verifyIssueAI = asyncHandler(async (req, res) => {
     // Match description with AI tags
     const matchedTag = tags.find(
         tag => VALID_TAGS.includes(tag) &&
-        (description.includes(tag) || description.includes("waste") || description.includes("garbage"))
+            (description.includes(tag) || description.includes("waste") || description.includes("garbage"))
     );
 
     const verified = matchedTag ? true : false;
@@ -95,8 +95,11 @@ const verifyIssueAI = asyncHandler(async (req, res) => {
     }
 
     return res.status(201).json(
-        new ApiResponse(201, { verification, tags }, verified 
-            ? "AI + description verified issue and points awarded" 
+        new ApiResponse(201, 
+            { verification, 
+                tags: verified ? tags : [] }, 
+                verified
+            ? "AI + description verified issue and points awarded"
             : "Verification failed (AI and description did not match)")
     );
 });
