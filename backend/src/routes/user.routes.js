@@ -18,7 +18,7 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// ✅ Registration with avatar & cover image
+//  Registration with avatar & cover image
 router.route("/register").post(
     upload.fields([
         { name: "avatar", maxCount: 1 },
@@ -27,19 +27,19 @@ router.route("/register").post(
     registerUser
 );
 
-// ✅ Login & Refresh
+//  Login & Refresh
 router.route("/login").post(loginUser);
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/refresh-token").post(refreshAccessToken);
 
-// ✅ Account Security
+//  Account Security
 router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 
-// ✅ Profile & Account
+//  Profile & Account
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/update-account").patch(verifyJWT, updateAccountDetails);
 
-// ✅ Civic-Specific
+//  Civic-Specific
 router.route("/issue").get(verifyJWT, getMyReportedIssues);   // citizen’s reported issues
 router.route("/assignment").get(verifyJWT, getMyAssignments); // worker/contractor’s assigned tasks
 

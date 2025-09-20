@@ -20,7 +20,7 @@ const visionClient = new ImageAnnotatorClient();
  */
 
 
-// ✅ Run AI verification and auto-tagging using Google Vision API
+//  Run AI verification and auto-tagging using Google Vision API
 const verifyIssueAI = asyncHandler(async (req, res) => {
     const { issueId } = req.params;
 
@@ -61,7 +61,7 @@ const verifyIssueAI = asyncHandler(async (req, res) => {
 });
 
 
-// ✅ Get AI result
+//  Get AI result
 const getVerificationResult = asyncHandler(async (req, res) => {
     const { issueId } = req.params;
     const verification = await AIVerification.findOne({ issueId });

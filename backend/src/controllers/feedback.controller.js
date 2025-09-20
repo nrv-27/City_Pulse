@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Feedback } from "../models/feedback.model.js";
 
-// ✅ Add feedback
+//  Add feedback
 const addFeedback = asyncHandler(async (req, res) => {
   const { rating, comments } = req.body;
   const { issueId } = req.params;
@@ -20,7 +20,7 @@ const addFeedback = asyncHandler(async (req, res) => {
   return res.status(201).json(new ApiResponse(201, feedback, "Feedback added"));
 });
 
-// ✅ Get feedback for issue
+//  Get feedback for issue
 const getFeedbackForIssue = asyncHandler(async (req, res) => {
   const { issueId } = req.params;
   const feedback = await Feedback.find({ issueId }).populate("userId", "fullName role");
