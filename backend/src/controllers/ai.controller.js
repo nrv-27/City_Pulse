@@ -47,7 +47,7 @@ const verifyIssueAI = asyncHandler(async (req, res) => {
     let existingVerification = await AIVerification.findOne({ issueId });
     if (existingVerification?.verified) {
         return res.status(200).json(
-            new ApiResponse(200, existingVerification, "✅ Issue already verified earlier")
+            new ApiResponse(200, existingVerification, "Issue already verified earlier")
         );
     }
 
