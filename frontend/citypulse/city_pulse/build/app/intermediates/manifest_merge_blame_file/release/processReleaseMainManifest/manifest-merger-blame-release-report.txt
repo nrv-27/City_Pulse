@@ -1,0 +1,243 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.city_pulse"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="35" />
+10
+11    <!-- ✅ Required permissions -->
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:5:5-67
+12-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:5:22-64
+13    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+13-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:6:5-79
+13-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:6:22-76
+14    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+14-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:7:5-81
+14-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:7:22-78
+15    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+15-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:8:5-79
+15-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:8:22-76
+16
+17    <queries>
+17-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:39:5-44:15
+18        <intent>
+18-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:40:9-43:18
+19            <action android:name="android.intent.action.PROCESS_TEXT" />
+19-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:41:13-72
+19-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:41:21-70
+20
+21            <data android:mimeType="text/plain" />
+21-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:42:13-50
+21-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:42:19-48
+22        </intent>
+23    </queries>
+24
+25    <permission
+25-->[androidx.core:core:1.16.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\6e9b87ddca682c26951d767f3a5f05e2\transformed\core-1.16.0\AndroidManifest.xml:22:5-24:47
+26        android:name="com.example.city_pulse.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+26-->[androidx.core:core:1.16.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\6e9b87ddca682c26951d767f3a5f05e2\transformed\core-1.16.0\AndroidManifest.xml:23:9-81
+27        android:protectionLevel="signature" />
+27-->[androidx.core:core:1.16.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\6e9b87ddca682c26951d767f3a5f05e2\transformed\core-1.16.0\AndroidManifest.xml:24:9-44
+28
+29    <uses-permission android:name="com.example.city_pulse.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+29-->[androidx.core:core:1.16.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\6e9b87ddca682c26951d767f3a5f05e2\transformed\core-1.16.0\AndroidManifest.xml:26:5-97
+29-->[androidx.core:core:1.16.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\6e9b87ddca682c26951d767f3a5f05e2\transformed\core-1.16.0\AndroidManifest.xml:26:22-94
+30
+31    <application
+32        android:name="android.app.Application"
+32-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:12:9-42
+33        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+33-->[androidx.core:core:1.16.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\6e9b87ddca682c26951d767f3a5f05e2\transformed\core-1.16.0\AndroidManifest.xml:28:18-86
+34        android:extractNativeLibs="false"
+35        android:icon="@mipmap/ic_launcher"
+35-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:13:9-43
+36        android:label="city_pulse" >
+36-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:11:9-35
+37        <activity
+37-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:15:9-32:20
+38            android:name="com.example.city_pulse.MainActivity"
+38-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:16:13-41
+39            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+39-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:20:13-163
+40            android:exported="true"
+40-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:17:13-36
+41            android:hardwareAccelerated="true"
+41-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:21:13-47
+42            android:launchMode="singleTop"
+42-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:18:13-43
+43            android:theme="@style/LaunchTheme"
+43-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:19:13-47
+44            android:windowSoftInputMode="adjustResize" >
+44-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:22:13-55
+45            <meta-data
+45-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:24:13-27:19
+46                android:name="io.flutter.embedding.android.NormalTheme"
+46-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:25:17-72
+47                android:resource="@style/NormalTheme" />
+47-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:26:17-54
+48
+49            <intent-filter>
+49-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:28:13-31:29
+50                <action android:name="android.intent.action.MAIN" />
+50-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:29:17-68
+50-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:29:25-66
+51
+52                <category android:name="android.intent.category.LAUNCHER" />
+52-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:30:17-76
+52-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:30:27-74
+53            </intent-filter>
+54        </activity>
+55
+56        <meta-data
+56-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:34:9-36:33
+57            android:name="flutterEmbedding"
+57-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:35:13-44
+58            android:value="2" />
+58-->E:\citypulse\city_pulse\android\app\src\main\AndroidManifest.xml:36:13-30
+59
+60        <service
+60-->[:geolocator_android] E:\citypulse\city_pulse\build\geolocator_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:8:9-12:56
+61            android:name="com.baseflow.geolocator.GeolocatorLocationService"
+61-->[:geolocator_android] E:\citypulse\city_pulse\build\geolocator_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:9:13-77
+62            android:enabled="true"
+62-->[:geolocator_android] E:\citypulse\city_pulse\build\geolocator_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:10:13-35
+63            android:exported="false"
+63-->[:geolocator_android] E:\citypulse\city_pulse\build\geolocator_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:11:13-37
+64            android:foregroundServiceType="location" />
+64-->[:geolocator_android] E:\citypulse\city_pulse\build\geolocator_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:12:13-53
+65
+66        <provider
+66-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:9:9-17:20
+67            android:name="io.flutter.plugins.imagepicker.ImagePickerFileProvider"
+67-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:10:13-82
+68            android:authorities="com.example.city_pulse.flutter.image_provider"
+68-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:11:13-74
+69            android:exported="false"
+69-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:12:13-37
+70            android:grantUriPermissions="true" >
+70-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:13:13-47
+71            <meta-data
+71-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:14:13-16:75
+72                android:name="android.support.FILE_PROVIDER_PATHS"
+72-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:15:17-67
+73                android:resource="@xml/flutter_image_picker_file_paths" />
+73-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:16:17-72
+74        </provider> <!-- Trigger Google Play services to install the backported photo picker module. -->
+75        <service
+75-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:19:9-31:19
+76            android:name="com.google.android.gms.metadata.ModuleDependencies"
+76-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:20:13-78
+77            android:enabled="false"
+77-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:21:13-36
+78            android:exported="false" >
+78-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:22:13-37
+79            <intent-filter>
+79-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:24:13-26:29
+80                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+80-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:25:17-94
+80-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:25:25-91
+81            </intent-filter>
+82
+83            <meta-data
+83-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:28:13-30:36
+84                android:name="photopicker_activity:0:required"
+84-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:29:17-63
+85                android:value="" />
+85-->[:image_picker_android] E:\citypulse\city_pulse\build\image_picker_android\intermediates\merged_manifest\release\processReleaseManifest\AndroidManifest.xml:30:17-33
+86        </service>
+87
+88        <activity
+88-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\9db9b81a577112600e8d2ee7b5450923\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:20:9-22:45
+89            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+89-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\9db9b81a577112600e8d2ee7b5450923\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:20:19-85
+90            android:exported="false"
+90-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\9db9b81a577112600e8d2ee7b5450923\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:22:19-43
+91            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+91-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\9db9b81a577112600e8d2ee7b5450923\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:21:19-78
+92
+93        <meta-data
+93-->[com.google.android.gms:play-services-basement:18.3.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\abeed4f47a72eff8f5b4e9bf7f2f3c91\transformed\jetified-play-services-basement-18.3.0\AndroidManifest.xml:21:9-23:69
+94            android:name="com.google.android.gms.version"
+94-->[com.google.android.gms:play-services-basement:18.3.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\abeed4f47a72eff8f5b4e9bf7f2f3c91\transformed\jetified-play-services-basement-18.3.0\AndroidManifest.xml:22:13-58
+95            android:value="@integer/google_play_services_version" />
+95-->[com.google.android.gms:play-services-basement:18.3.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\abeed4f47a72eff8f5b4e9bf7f2f3c91\transformed\jetified-play-services-basement-18.3.0\AndroidManifest.xml:23:13-66
+96
+97        <uses-library
+97-->[androidx.window:window:1.2.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\5093ab42d2307deb2d7ac0b7f5718c38\transformed\jetified-window-1.2.0\AndroidManifest.xml:23:9-25:40
+98            android:name="androidx.window.extensions"
+98-->[androidx.window:window:1.2.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\5093ab42d2307deb2d7ac0b7f5718c38\transformed\jetified-window-1.2.0\AndroidManifest.xml:24:13-54
+99            android:required="false" />
+99-->[androidx.window:window:1.2.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\5093ab42d2307deb2d7ac0b7f5718c38\transformed\jetified-window-1.2.0\AndroidManifest.xml:25:13-37
+100        <uses-library
+100-->[androidx.window:window:1.2.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\5093ab42d2307deb2d7ac0b7f5718c38\transformed\jetified-window-1.2.0\AndroidManifest.xml:26:9-28:40
+101            android:name="androidx.window.sidecar"
+101-->[androidx.window:window:1.2.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\5093ab42d2307deb2d7ac0b7f5718c38\transformed\jetified-window-1.2.0\AndroidManifest.xml:27:13-51
+102            android:required="false" />
+102-->[androidx.window:window:1.2.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\5093ab42d2307deb2d7ac0b7f5718c38\transformed\jetified-window-1.2.0\AndroidManifest.xml:28:13-37
+103
+104        <provider
+104-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\e80aa748ff6540407d8dba61c0d945fe\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:24:9-32:20
+105            android:name="androidx.startup.InitializationProvider"
+105-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\e80aa748ff6540407d8dba61c0d945fe\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:25:13-67
+106            android:authorities="com.example.city_pulse.androidx-startup"
+106-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\e80aa748ff6540407d8dba61c0d945fe\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:26:13-68
+107            android:exported="false" >
+107-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\e80aa748ff6540407d8dba61c0d945fe\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:27:13-37
+108            <meta-data
+108-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\e80aa748ff6540407d8dba61c0d945fe\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+109                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+109-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\e80aa748ff6540407d8dba61c0d945fe\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+110                android:value="androidx.startup" />
+110-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\e80aa748ff6540407d8dba61c0d945fe\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+111            <meta-data
+111-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+112                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+112-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+113                android:value="androidx.startup" />
+113-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+114        </provider>
+115
+116        <receiver
+116-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+117            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+117-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+118            android:directBootAware="false"
+118-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+119            android:enabled="true"
+119-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+120            android:exported="true"
+120-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+121            android:permission="android.permission.DUMP" >
+121-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+122            <intent-filter>
+122-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+123                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+123-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+123-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+124            </intent-filter>
+125            <intent-filter>
+125-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+126                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+126-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+126-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+127            </intent-filter>
+128            <intent-filter>
+128-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+129                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+129-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+129-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+130            </intent-filter>
+131            <intent-filter>
+131-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+132                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+132-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+132-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\shrey\.gradle\caches\8.10.2\transforms\4051a23600791cfac099a18cb55e807e\transformed\jetified-profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
+133            </intent-filter>
+134        </receiver>
+135    </application>
+136
+137</manifest>
