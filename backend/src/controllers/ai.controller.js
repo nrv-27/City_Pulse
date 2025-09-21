@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { AIVerification } from "../models/aiVerification.model.js";
 import { Issue } from "../models/issue.model.js";
 import { User } from "../models/user.model.js";
-import { ImageAnnotatorClient } from "@google-cloud/vision";
+import { ImageAnnotatorClient } from '@google-cloud/vision';
 
 // Initialize Google Vision Client
 const visionClient = new ImageAnnotatorClient();
@@ -99,7 +99,7 @@ const verifyIssueAI = asyncHandler(async (req, res) => {
             { verification, 
                 tags: verified ? tags : [] }, 
                 verified
-            ? "AI + description verified issue and points awarded"
+            ? "AI + description verified issue and 50 points awarded"
             : "Verification failed (AI and description did not match)")
     );
 });

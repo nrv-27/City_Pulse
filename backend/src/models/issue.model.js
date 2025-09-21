@@ -6,7 +6,7 @@ const issueSchema = new Schema(
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true, trim: true },
     description: { type: String },
-    category: { type: String, enum: ["pothole", "garbage", "streetlight", "water", "other"], required: true },
+    category: { type: String, enum: ["pothole", "garbage", "streetlight", "water", "other"] },
     status: { type: String, enum: ["pending", "verified", "in_progress", "resolved", "rejected"], default: "pending" },
     reportedBy: {                    // <-- Add this
         type: mongoose.Schema.Types.ObjectId,

@@ -11,6 +11,7 @@ function Sidebar() {
         <Link to="/map" className="hover:bg-gray-700 p-2 rounded">🗺️ Map</Link>
         <Link to="/campaigns" className="hover:bg-gray-700 p-2 rounded">📢 Campaigns</Link>
         <Link to="/analytics" className="hover:bg-gray-700 p-2 rounded">📈 Analytics</Link>
+        <Link to="/profile" className="hover:bg-gray-700 p-2 rounded">👤 Profile</Link>
       </nav>
     </div>
   );

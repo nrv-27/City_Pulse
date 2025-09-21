@@ -4,74 +4,56 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Issue } from "../models/issue.model.js";
 import { IssueMedia } from "../models/issue_media.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
-import { 
+import {
   notifyReporter,
   notifyReporterOnStatusUpdate,
-  notifyUsersOnResolution } from './notification.controller.js';
+  notifyUsersOnResolution,
+} from "./notification.controller.js";
 
 // Citizen creates issue
 const createIssue = asyncHandler(async (req, res) => {
-  const { title, description, category, lat, lng, address } = req.body;
+  // Destructure all expected fields from the body
+  const { title, description, category, lat, lng, address, assignedTo = [] } = req.body;
 
-  if (!title || !category || !lat || !lng) {
-    throw new ApiError(400, "Missing required fields");
+  // 1. Initial validation
+  if (!title || !lat || !lng) {
+    throw new ApiError(400, "Title and location (lat, lng) are required");
   }
 
+  // 2. Create the issue instance ONCE with all data
   const issue = await Issue.create({
     userId: req.user._id,
+    reportedBy: req.user._id, // Set reportedBy from the authenticated user
     title,
     description,
     category,
     location: { lat, lng },
     address,
-    media: [],
-    reportedBy: req.user._id,
+    media: [], // Initialize media as empty, will be populated next
+    assignedTo,
   });
 
-  // Upload files to Cloudinary and save in IssueMedia
-  const mediaIds = [];
+  // 3. Handle media uploads if files exist
   if (req.files?.length > 0) {
-    for (const file of req.files) {
+    const mediaPromises = req.files.map(async (file) => {
       const uploaded = await uploadOnCloudinary(file.path);
-
       const mediaDoc = await IssueMedia.create({
         issueId: issue._id,
         fileUrl: uploaded.url,
-        mediaType: file.mimetype.startsWith("video") ? "video" : "image"
+        mediaType: file.mimetype.startsWith("video") ? "video" : "image",
       });
+      return mediaDoc._id;
+    });
 
-      mediaIds.push(mediaDoc._id);
-    }
-
+    const mediaIds = await Promise.all(mediaPromises);
     issue.media = mediaIds;
     await issue.save();
   }
-  
-  const {reportedBy, assignedTo = [] } = req.body;
 
-    try {
-        const issue = new Issue({
-            title,
-            description,
-            reportedBy,
-            assignedTo,
-            status: 'reported',
-            createdAt: new Date(),
-        });
+  // 4. 🔔 Notify the reporter that the issue has been created
+  await notifyReporter(issue);
 
-        await issue.save();
-
-        // 🔔 Notify the reporter
-        await notifyReporter(issue);
-
-        res.status(201).json({ message: 'Issue created successfully', issue });
-    } catch (error) {
-        console.error('Create issue error:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-
-
-
+  // 5. Send a single, final success response
   return res
     .status(201)
     .json(new ApiResponse(201, issue, "Issue reported successfully"));
@@ -86,16 +68,18 @@ const deleteIssue = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Issue not found");
   }
 
+  // You might also want to delete associated media from Cloudinary and the IssueMedia collection here
+
   await Issue.findByIdAndDelete(issueId);
 
-  res.status(200).json(new ApiResponse(200, null, "Issue deleted successfully"));
-})
+  res.status(200).json(new ApiResponse(200, {}, "Issue deleted successfully"));
+});
 
 // Get all issues (admin dashboard)
 const getAllIssues = asyncHandler(async (req, res) => {
   const issues = await Issue.find()
     .populate("userId", "fullName role")
-    .populate("media"); // populate media objects
+    .populate("media");
   return res.status(200).json(new ApiResponse(200, issues, "All issues fetched"));
 });
 
@@ -103,7 +87,7 @@ const getAllIssues = asyncHandler(async (req, res) => {
 const getIssueById = asyncHandler(async (req, res) => {
   const issue = await Issue.findById(req.params.id)
     .populate("userId", "fullName role")
-    .populate("media"); // populate media objects
+    .populate("media");
   if (!issue) throw new ApiError(404, "Issue not found");
   return res.status(200).json(new ApiResponse(200, issue, "Issue fetched"));
 });
@@ -111,35 +95,33 @@ const getIssueById = asyncHandler(async (req, res) => {
 // Update issue status
 const updateIssueStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
-  const issue = await Issue.findByIdAndUpdate(
-    req.params.id,
+  const { id } = req.params;
+
+  if (!status) {
+    throw new ApiError(400, "Status field is required");
+  }
+
+  // 1. Find and update the issue in one atomic operation
+  const updatedIssue = await Issue.findByIdAndUpdate(
+    id,
     { status },
-    { new: true }
+    { new: true } // This option returns the updated document
   );
-  if (!issue) throw new ApiError(404, "Issue not found");
-  const { issueId } = req.body;
 
-    try {
-        const issue = await Issue.findById(issueId);
-        if (!issue) return res.status(404).json({ error: 'Issue not found' });
+  if (!updatedIssue) {
+    throw new ApiError(404, "Issue not found");
+  }
 
-        issue.status = status;
-        await issue.save();
+  // 2. 🔔 Send notifications based on the new status
+  await notifyReporterOnStatusUpdate(updatedIssue);
 
-        // 🔔 Notify reporter about status update
-        await notifyReporterOnStatusUpdate(issue);
+  if (updatedIssue.status === 'resolved') {
+    // 🔔 Notify everyone involved
+    await notifyUsersOnResolution(updatedIssue);
+  }
 
-        if (status === 'resolved') {
-            // 🔔 Notify everyone involved
-            await notifyUsersOnResolution(issue);
-        }
-
-        res.status(200).json({ message: 'Status updated', issue });
-    } catch (error) {
-        console.error('Update issue error:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-  return res.status(200).json(new ApiResponse(200, issue, "Issue status updated"));
+  // 3. Send the final success response
+  return res.status(200).json(new ApiResponse(200, updatedIssue, "Issue status updated"));
 });
 
 export { createIssue, deleteIssue, getAllIssues, getIssueById, updateIssueStatus };
