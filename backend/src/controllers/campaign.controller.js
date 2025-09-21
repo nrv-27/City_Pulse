@@ -35,7 +35,7 @@ const getCampaignById = asyncHandler(async (req, res) => {
 
 // Join a campaign
 const joinCampaign = asyncHandler(async (req, res) => {
-  const { id } = req.params; // campaign id
+  const { id } = req.params; 
   const userId = req.user._id;
 
   const campaign = await Campaign.findById(id);

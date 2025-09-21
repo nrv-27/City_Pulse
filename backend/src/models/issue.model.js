@@ -8,7 +8,7 @@ const issueSchema = new Schema(
     description: { type: String },
     category: { type: String, enum: ["pothole", "garbage", "streetlight", "water", "other"] },
     status: { type: String, enum: ["pending", "verified", "in_progress", "resolved", "rejected"], default: "pending" },
-    reportedBy: {                    // <-- Add this
+    reportedBy: {                    
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
@@ -18,7 +18,7 @@ const issueSchema = new Schema(
       lng: { type: Number, required: true }
     },
     address: { type: String },
-    priority: { type: Number, default: 0 }, // AI-assigned priority
+    priority: { type: Number, default: 0 }, 
     media: [{ type: Schema.Types.ObjectId, ref: "IssueMedia" }]
   },
   { timestamps: true }

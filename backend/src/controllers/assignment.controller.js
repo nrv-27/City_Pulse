@@ -5,7 +5,7 @@ import { Assignment } from "../models/assignment.model.js";
 import { User } from "../models/user.model.js";
 import { Issue } from "../models/issue.model.js";
 
-// Assign an issue to a worker
+
 const assignIssue = asyncHandler(async (req, res) => {
   const { assignedTo, title } = req.body;
 
@@ -30,11 +30,13 @@ const assignIssue = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, assignment, "Issue assigned"));
 });
 
+
+
 // Get assignments assigned to the current logged-in user
 const getAssignmentsByUser = asyncHandler(async (req, res) => {
   const assignments = await Assignment.find({ assignedTo: req.user._id })
     .populate("issueId")
-    .populate("assignedBy", "name email"); // optionally include assignedBy info
+    .populate("assignedBy", "name email"); 
 
   return res
     .status(200)
@@ -42,6 +44,7 @@ const getAssignmentsByUser = asyncHandler(async (req, res) => {
 });
 
 
+//searchAssignments
 const searchAssignments = asyncHandler(async (req, res) => {
   const username = req.query?.username || req.body?.username;
   const issueDescription = req.query?.issueDescription || req.body?.issueDescription;

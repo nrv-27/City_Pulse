@@ -42,7 +42,7 @@ const notifyUsersOnResolution = async (issue) => {
   }
 };
 
-// GET: Fetch notifications for a user
+// Fetch notifications for a user
 const getUserNotifications = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 

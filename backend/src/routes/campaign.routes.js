@@ -12,7 +12,7 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-// Public route (if needed, else protect all)
+// Public route 
 router.get("/", getAllCampaigns);
 router.get("/:id", getCampaignById);
 

@@ -30,9 +30,9 @@ const notificationSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // automatically adds createdAt and updatedAt
+    timestamps: true, 
   }
 );
 
-// Export as named export to match controller import style
+
 export const Notification = mongoose.model('Notification', notificationSchema);

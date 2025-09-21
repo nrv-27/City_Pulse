@@ -40,7 +40,7 @@ router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/update-account").patch(verifyJWT, updateAccountDetails);
 
 //  Civic-Specific
-router.route("/issue").get(verifyJWT, getMyReportedIssues);   // citizen’s reported issues
-router.route("/assignment").get(verifyJWT, getMyAssignments); // worker/contractor’s assigned tasks
+router.route("/issue").get(verifyJWT, getMyReportedIssues);   
+router.route("/assignment").get(verifyJWT, getMyAssignments); 
 
 export default router;

@@ -120,11 +120,7 @@ const loginUser = asyncHandler(async (req, res) =>{
         throw new ApiError(400, "username or email is required")
     }
     
-    // Here is an alternative of above code based on logic discussed in video:
-    // if (!(username || email)) {
-    //     throw new ApiError(400, "username or email is required")
-        
-    // }
+ 
 
     const user = await User.findOne({
         $or: [{username}, {email}]
@@ -170,7 +166,7 @@ const logoutUser = asyncHandler(async(req, res) => {
         req.user._id,
         {
             $unset: {
-                refreshToken: 1 // this removes the field from document
+                refreshToken: 1 
             }
         },
         {
@@ -370,7 +366,7 @@ const getMyReportedIssues = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, issues, "Reported issues fetched"));
 });
 
-// ✅ Fetch all assignments for current worker
+// Fetch all assignments for current worker
 const getMyAssignments = asyncHandler(async (req, res) => {
   const assignments = await Assignment.find({ assignedTo: req.user._id })
     .populate("issueId")

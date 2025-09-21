@@ -12,24 +12,23 @@ import {
 
 // Citizen creates issue
 const createIssue = asyncHandler(async (req, res) => {
-  // Destructure all expected fields from the body
+
   const { title, description, category, lat, lng, address, assignedTo = [] } = req.body;
 
-  // 1. Initial validation
   if (!title || !lat || !lng) {
     throw new ApiError(400, "Title and location (lat, lng) are required");
   }
 
-  // 2. Create the issue instance ONCE with all data
+
   const issue = await Issue.create({
     userId: req.user._id,
-    reportedBy: req.user._id, // Set reportedBy from the authenticated user
+    reportedBy: req.user._id, 
     title,
     description,
     category,
     location: { lat, lng },
     address,
-    media: [], // Initialize media as empty, will be populated next
+    media: [], 
     assignedTo,
   });
 
@@ -50,10 +49,10 @@ const createIssue = asyncHandler(async (req, res) => {
     await issue.save();
   }
 
-  // 4. 🔔 Notify the reporter that the issue has been created
+  // Notify the reporter that the issue has been created
   await notifyReporter(issue);
 
-  // 5. Send a single, final success response
+  // Send a single, final success response
   return res
     .status(201)
     .json(new ApiResponse(201, issue, "Issue reported successfully"));
@@ -68,14 +67,13 @@ const deleteIssue = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Issue not found");
   }
 
-  // You might also want to delete associated media from Cloudinary and the IssueMedia collection here
 
   await Issue.findByIdAndDelete(issueId);
 
   res.status(200).json(new ApiResponse(200, {}, "Issue deleted successfully"));
 });
 
-// Get all issues (admin dashboard)
+// Get all issues 
 const getAllIssues = asyncHandler(async (req, res) => {
   const issues = await Issue.find()
     .populate("userId", "fullName role")
@@ -101,26 +99,26 @@ const updateIssueStatus = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Status field is required");
   }
 
-  // 1. Find and update the issue in one atomic operation
+  // Find and update the issue in one atomic operation
   const updatedIssue = await Issue.findByIdAndUpdate(
     id,
     { status },
-    { new: true } // This option returns the updated document
+    { new: true } 
   );
 
   if (!updatedIssue) {
     throw new ApiError(404, "Issue not found");
   }
 
-  // 2. 🔔 Send notifications based on the new status
+  // Send notifications based on the new status
   await notifyReporterOnStatusUpdate(updatedIssue);
 
   if (updatedIssue.status === 'resolved') {
-    // 🔔 Notify everyone involved
+    // Notify everyone involved
     await notifyUsersOnResolution(updatedIssue);
   }
 
-  // 3. Send the final success response
+  // Send the final success response
   return res.status(200).json(new ApiResponse(200, updatedIssue, "Issue status updated"));
 });
 

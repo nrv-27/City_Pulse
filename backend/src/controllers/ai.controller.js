@@ -11,25 +11,12 @@ const visionClient = new ImageAnnotatorClient();
 
 //  Predefined keywords for verification
 const VALID_TAGS = [
-    // Waste management
     "garbage", "trash", "waste", "litter", "dumping", "overflowing bin",
-
-    // Road & Transport
     "pothole", "road damage", "broken sidewalk", "blocked road", "traffic light not working", "damaged signboard",
-
-    // Water & Sanitation
     "sewage", "open drain", "waterlogging", "leakage", "broken pipeline",
-
-    // Electricity
     "streetlight not working", "electrical hazard", "exposed wires", "power outage",
-
-    // Environment
     "illegal construction", "deforestation", "pollution", "burning waste",
-
-    // Public Safety
     "vandalism", "graffiti", "illegal parking", "encroachment", "broken fence",
-
-    // Public Facilities
     "park maintenance", "broken bench", "damaged playground", "public toilet issue"
 ];
 
@@ -85,7 +72,7 @@ const verifyIssueAI = asyncHandler(async (req, res) => {
         { new: true, upsert: true }
     );
 
-    // If verified and first time → award points
+    // If verified and first time then award 50 points
     if (verified && (!existingVerification || !existingVerification.verified)) {
         const user = await User.findById(issue.userId);
         if (user) {
