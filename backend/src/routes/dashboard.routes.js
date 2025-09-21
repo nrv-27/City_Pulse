@@ -1,15 +1,24 @@
-import { Router } from 'express';
-import {
-    getChannelStats,
-    getChannelVideos,
-} from "../controllers/dashboard.controller.js"
-import {verifyJWT} from "../middlewares/auth.middleware.js"
+import { Router } from "express";
+import { 
+    getDashboardStats,
+    getRecentIssues,
+    getRecentNotifications,
+    getIssuesByCategory
+} from "../controllers/dashboard.controller.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
+// Get overall dashboard stats
+router.get("/stats", verifyJWT, getDashboardStats);
 
-router.route("/stats").get(getChannelStats);
-router.route("/videos").get(getChannelVideos);
+// Get latest issues
+router.get("/recent-issues", verifyJWT, getRecentIssues);
 
-export default router
+// Get latest notifications
+router.get("/notifications", verifyJWT, getRecentNotifications);
+
+// Get issues grouped by category
+router.get("/issues-by-category", verifyJWT, getIssuesByCategory);
+
+export default router;

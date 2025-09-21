@@ -2,25 +2,82 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Assignment } from "../models/assignment.model.js";
+import { User } from "../models/user.model.js";
+import { Issue } from "../models/issue.model.js";
 
-//  Assign issue to worker
+// Assign an issue to a worker
 const assignIssue = asyncHandler(async (req, res) => {
-  const { issueId, assignedTo } = req.body;
-  if (!issueId || !assignedTo) throw new ApiError(400, "Missing fields");
+  const { assignedTo, title } = req.body;
+
+  if (!assignedTo || !title) throw new ApiError(400, "Missing fields");
+
+  // Find issue by title
+  const issue = await Issue.findOne({ title: title });
+  if (!issue) throw new ApiError(404, "Issue not found with this title");
+
+  // Find user by username
+  const user = await User.findOne({ username: assignedTo });
+  if (!user) throw new ApiError(404, "User not found with this username");
 
   const assignment = await Assignment.create({
-    issueId,
-    assignedTo,
+    issueId: issue._id,
+    assignedTo: user._id,
     assignedBy: req.user._id
   });
 
-  return res.status(201).json(new ApiResponse(201, assignment, "Issue assigned"));
+  return res
+    .status(201)
+    .json(new ApiResponse(201, assignment, "Issue assigned"));
 });
 
-//  Get assignments by current user
+// Get assignments assigned to the current logged-in user
 const getAssignmentsByUser = asyncHandler(async (req, res) => {
-  const assignments = await Assignment.find({ assignedTo: req.user._id }).populate("issueId");
-  return res.status(200).json(new ApiResponse(200, assignments, "Assignments fetched"));
+  const assignments = await Assignment.find({ assignedTo: req.user._id })
+    .populate("issueId")
+    .populate("assignedBy", "name email"); // optionally include assignedBy info
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, assignments, "Assignments fetched"));
 });
 
-export { assignIssue, getAssignmentsByUser };
+
+const searchAssignments = asyncHandler(async (req, res) => {
+  const username = req.query?.username || req.body?.username;
+  const issueDescription = req.query?.issueDescription || req.body?.issueDescription;
+  const title = req.query?.title || req.body?.title;
+
+  if (!username && !issueDescription && !title) {
+    throw new ApiError(400, "No search fields provided");
+  }
+
+  const filter = {};
+
+  if (username) {
+    const user = await User.findOne({ name: { $regex: new RegExp(username, "i") } });
+    if (user) filter.assignedTo = user._id;
+    else filter.assignedTo = null; 
+  }
+
+
+  let assignmentsQuery = Assignment.find(filter)
+    .populate({
+      path: "issueId",
+      match: {
+        ...(issueDescription ? { description: { $regex: new RegExp(issueDescription, "i") } } : {}),
+        ...(title ? { title: { $regex: new RegExp(title, "i") } } : {})
+      }
+    })
+    .populate("assignedTo", "name");
+
+  const assignments = await assignmentsQuery.exec();
+
+  const filteredAssignments = assignments.filter(a => a.issueId !== null);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, filteredAssignments, "Assignments search results"));
+});
+
+
+export { assignIssue, getAssignmentsByUser, searchAssignments };

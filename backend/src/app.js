@@ -20,16 +20,18 @@ import userRouter from './routes/user.routes.js';
 import issueRoutes from "./routes/issue.routes.js";
 import assignmentRoutes from "./routes/assignment.routes.js";
 import feedbackRoutes from "./routes/feedback.routes.js";
-import notificationRoutes from "./routes/notification.routes.js";
 import aiRoutes from "./routes/ai.routes.js";
+import campaignRoutes from "./routes/campaign.routes.js"
+import dashboardRoutes from "./routes/dashboard.routes.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/issue", issueRoutes);
 app.use("/api/v1/assignment", assignmentRoutes);
 app.use("/api/v1/feedback", feedbackRoutes);
-app.use("/api/v1/notification", notificationRoutes);
 app.use("/api/v1/ai", aiRoutes);
+app.use("/api/v1/campaign", campaignRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes); 
 
 // http://localhost:3000/api/v1/
 

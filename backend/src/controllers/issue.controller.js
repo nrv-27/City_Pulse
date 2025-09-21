@@ -4,6 +4,10 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Issue } from "../models/issue.model.js";
 import { IssueMedia } from "../models/issue_media.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { 
+  notifyReporter,
+  notifyReporterOnStatusUpdate,
+  notifyUsersOnResolution } from './notification.controller.js';
 
 // Citizen creates issue
 const createIssue = asyncHandler(async (req, res) => {
@@ -20,7 +24,8 @@ const createIssue = asyncHandler(async (req, res) => {
     category,
     location: { lat, lng },
     address,
-    media: []
+    media: [],
+    reportedBy: req.user._id,
   });
 
   // Upload files to Cloudinary and save in IssueMedia
@@ -38,15 +43,53 @@ const createIssue = asyncHandler(async (req, res) => {
       mediaIds.push(mediaDoc._id);
     }
 
-    // Update issue with media IDs
     issue.media = mediaIds;
     await issue.save();
   }
+  
+  const {reportedBy, assignedTo = [] } = req.body;
+
+    try {
+        const issue = new Issue({
+            title,
+            description,
+            reportedBy,
+            assignedTo,
+            status: 'reported',
+            createdAt: new Date(),
+        });
+
+        await issue.save();
+
+        // 🔔 Notify the reporter
+        await notifyReporter(issue);
+
+        res.status(201).json({ message: 'Issue created successfully', issue });
+    } catch (error) {
+        console.error('Create issue error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+
+
 
   return res
     .status(201)
     .json(new ApiResponse(201, issue, "Issue reported successfully"));
 });
+
+// Delete the issue
+const deleteIssue = asyncHandler(async (req, res) => {
+  const { issueId } = req.params;
+
+  const issue = await Issue.findById(issueId);
+  if (!issue) {
+    throw new ApiError(404, "Issue not found");
+  }
+
+  await Issue.findByIdAndDelete(issueId);
+
+  res.status(200).json(new ApiResponse(200, null, "Issue deleted successfully"));
+})
 
 // Get all issues (admin dashboard)
 const getAllIssues = asyncHandler(async (req, res) => {
@@ -74,7 +117,29 @@ const updateIssueStatus = asyncHandler(async (req, res) => {
     { new: true }
   );
   if (!issue) throw new ApiError(404, "Issue not found");
+  const { issueId } = req.body;
+
+    try {
+        const issue = await Issue.findById(issueId);
+        if (!issue) return res.status(404).json({ error: 'Issue not found' });
+
+        issue.status = status;
+        await issue.save();
+
+        // 🔔 Notify reporter about status update
+        await notifyReporterOnStatusUpdate(issue);
+
+        if (status === 'resolved') {
+            // 🔔 Notify everyone involved
+            await notifyUsersOnResolution(issue);
+        }
+
+        res.status(200).json({ message: 'Status updated', issue });
+    } catch (error) {
+        console.error('Update issue error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
   return res.status(200).json(new ApiResponse(200, issue, "Issue status updated"));
 });
 
-export { createIssue, getAllIssues, getIssueById, updateIssueStatus };
+export { createIssue, deleteIssue, getAllIssues, getIssueById, updateIssueStatus };

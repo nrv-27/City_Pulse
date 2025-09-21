@@ -1,13 +1,38 @@
-import mongoose, {Schema} from "mongoose";
+// src/models/notification.model.js
 
-const notificationSchema = new Schema(
+import mongoose from 'mongoose';
+
+const notificationSchema = new mongoose.Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    issueId: { type: Schema.Types.ObjectId, ref: "Issue" },
-    channel: { type: String, enum: ["app", "sms", "email"], required: true },
-    message: { type: String, required: true },
-    sentAt: { type: Date, default: Date.now }
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+    notificationType: {
+      type: String,
+      enum: ['issue_report', 'issue_update', 'issue_resolution'],
+      required: true,
+    },
+    issue: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Issue',
+      default: null,
+    },
+    status: {
+      type: String,
+      enum: ['unread', 'read'],
+      default: 'unread',
+    },
+  },
+  {
+    timestamps: true, // automatically adds createdAt and updatedAt
   }
 );
 
-export const Notification = mongoose.model("Notification", notificationSchema);
+// Export as named export to match controller import style
+export const Notification = mongoose.model('Notification', notificationSchema);

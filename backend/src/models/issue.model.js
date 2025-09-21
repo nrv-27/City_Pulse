@@ -8,6 +8,11 @@ const issueSchema = new Schema(
     description: { type: String },
     category: { type: String, enum: ["pothole", "garbage", "streetlight", "water", "other"], required: true },
     status: { type: String, enum: ["pending", "verified", "in_progress", "resolved", "rejected"], default: "pending" },
+    reportedBy: {                    // <-- Add this
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
     location: {
       lat: { type: Number, required: true },
       lng: { type: Number, required: true }
