@@ -84,7 +84,7 @@ const getAllIssues = asyncHandler(async (req, res) => {
 // Get single issue
 const getIssueById = asyncHandler(async (req, res) => {
   const issue = await Issue.findById(req.params.id)
-    .populate("userId", "fullName role")
+    .populate("reportedBy", "fullName avatar")
     .populate("media");
   if (!issue) throw new ApiError(404, "Issue not found");
   return res.status(200).json(new ApiResponse(200, issue, "Issue fetched"));
