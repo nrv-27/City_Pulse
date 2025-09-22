@@ -9,12 +9,15 @@ import { ApiError } from "../utils/ApiError.js";
 export const getDashboardStats = asyncHandler(async (req, res) => {
     try {
         const totalIssues = await Issue.countDocuments();
-        const resolvedIssues = await Issue.countDocuments({ status: "Resolved" });
-        const pendingIssues = await Issue.countDocuments({ status: "Pending" });
-        const inProgress = await Issue.countDocuments({ status: "In Progress" });
+        const resolvedIssues = await Issue.countDocuments({ status: "resolved" });
+        const pendingIssues = await Issue.countDocuments({ status: "pending" });
+        const inProgress = await Issue.countDocuments({ status: "in_progress" });
 
-        // const totalUsers = await User.countDocuments();
-        // const totalAdmins = await User.countDocuments({ role: "Admin" });
+        // Fetch the current user to get their points
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
 
         return res.status(200).json(
             new ApiResponse(200, {
@@ -22,8 +25,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
                 resolvedIssues,
                 pendingIssues,
                 inProgress,
-                // totalUsers,
-                // totalAdmins
+                userPoints: user.points || 0,
             }, "Dashboard statistics fetched successfully")
         );
     } catch (err) {
@@ -33,22 +35,17 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
 
 // Recent issues (for dashboard list)
 export const getRecentIssues = asyncHandler(async (req, res) => {
-    console.log("Fetching recent issues...");
     const issues = await Issue.find()
         .sort({ createdAt: -1 })
         .limit(10)
         .populate("reportedBy", "username email");
 
-    console.log("Found issues:", issues.length);
-    return res.status(200).json({ issues });
+    return res.status(200).json(new ApiResponse(200, issues, "Recent issues fetched successfully"));
 });
 
 // Recent notifications
 export const getRecentNotifications = asyncHandler(async (req, res, next) => {
-  // Fake a req.params.userId for getUserNotifications since it expects that
   req.params.userId = req.user._id;
-
-  // Call the notification controller function directly
   await getUserNotifications(req, res, next);
 });
 
@@ -60,10 +57,25 @@ export const getIssuesByCategory = asyncHandler(async (req, res) => {
         ]);
 
         return res.status(200).json(
-            new ApiResponse(200, categories, "Issues by category fetched successfully")
+            new ApiResponse(200, categories.map(c => ({ category: c._id, count: c.count })), "Issues by category fetched successfully")
         );
     } catch (err) {
         throw new ApiError(500, "Failed to fetch category stats");
     }
 });
 
+// Get top 10 users for leaderboard
+export const getLeaderboard = asyncHandler(async (req, res) => {
+    try {
+        const topUsers = await User.find()
+            .sort({ points: -1 })
+            .limit(10)
+            .select("fullName username avatar points");
+
+        return res.status(200).json(
+            new ApiResponse(200, topUsers, "Leaderboard data fetched successfully")
+        );
+    } catch (err) {
+        throw new ApiError(500, "Failed to fetch leaderboard data");
+    }
+});

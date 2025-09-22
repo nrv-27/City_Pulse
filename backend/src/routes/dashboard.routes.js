@@ -3,22 +3,17 @@ import {
     getDashboardStats,
     getRecentIssues,
     getRecentNotifications,
-    getIssuesByCategory
+    getIssuesByCategory,
+    getLeaderboard
 } from "../controllers/dashboard.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// Get overall dashboard stats
 router.get("/stats", verifyJWT, getDashboardStats);
-
-// Get latest issues
 router.get("/recent-issues", verifyJWT, getRecentIssues);
-
-// Get latest notifications
 router.get("/notifications", verifyJWT, getRecentNotifications);
-
-// Get issues grouped by category
 router.get("/issues-by-category", verifyJWT, getIssuesByCategory);
+router.get("/leaderboard", verifyJWT, getLeaderboard);
 
 export default router;

@@ -66,7 +66,7 @@ const verifyIssueAI = asyncHandler(async (req, res) => {
         {
             issueId,
             verified,
-            confidenceScore: Math.round((labels[0].score || 0) * 100),
+            confidenceScore: Math.round((labels[0].score || 0)),
             tags: tags.slice(0, 5)
         },
         { new: true, upsert: true }

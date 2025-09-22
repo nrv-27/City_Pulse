@@ -6,10 +6,15 @@ import { User } from "../models/user.model.js";
 
 // Create a new campaign
 const createCampaign = asyncHandler(async (req, res) => {
-  const { campaignName, campaignDate, campaignStatus, pointsAddedAfterJoining } = req.body;
+  const { campaignName, description, campaignDate, campaignStatus, pointsAddedAfterJoining } = req.body;
+
+  if (!campaignName || !campaignDate) {
+    throw new ApiError(400, "Campaign name and date are required");
+  }
 
   const campaign = await Campaign.create({
     campaignName,
+    description,
     campaignDate,
     campaignStatus,
     pointsAddedAfterJoining: pointsAddedAfterJoining || 0
@@ -20,14 +25,14 @@ const createCampaign = asyncHandler(async (req, res) => {
 
 // Get all campaigns
 const getAllCampaigns = asyncHandler(async (req, res) => {
-  const campaigns = await Campaign.find().populate("participants", "name email");
+  const campaigns = await Campaign.find().populate("participants", "fullName email");
   res.status(200).json(new ApiResponse(200, campaigns, "Campaigns fetched successfully"));
 });
 
 // Get single campaign
 const getCampaignById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const campaign = await Campaign.findById(id).populate("participants", "name email");
+  const campaign = await Campaign.findById(id).populate("participants", "fullName email");
   if (!campaign) throw new ApiError(404, "Campaign not found");
 
   res.status(200).json(new ApiResponse(200, campaign, "Campaign fetched successfully"));
@@ -41,19 +46,15 @@ const joinCampaign = asyncHandler(async (req, res) => {
   const campaign = await Campaign.findById(id);
   if (!campaign) throw new ApiError(404, "Campaign not found");
 
-  // Check if already joined
   if (campaign.participants.includes(userId)) {
-    return res.status(400).json(new ApiResponse(400, null, "User already joined this campaign"));
+    throw new ApiError(400, "User already joined this campaign");
   }
 
-  // Add user to participants
   campaign.participants.push(userId);
   await campaign.save();
 
-  // Add points to user
-  const user = await User.findById(userId);
-  user.points = (user.points || 0) + campaign.pointsAddedAfterJoining;
-  await user.save();
+  // Award points to the user who joined
+  await User.findByIdAndUpdate(userId, { $inc: { points: campaign.pointsAddedAfterJoining || 0 } });
 
   res.status(200).json(new ApiResponse(200, campaign, "Successfully joined campaign and points added"));
 });
@@ -63,11 +64,13 @@ const updateCampaignStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { campaignStatus } = req.body;
 
-  const campaign = await Campaign.findById(id);
-  if (!campaign) throw new ApiError(404, "Campaign not found");
+  const campaign = await Campaign.findByIdAndUpdate(
+    id,
+    { campaignStatus },
+    { new: true }
+  );
 
-  campaign.campaignStatus = campaignStatus;
-  await campaign.save();
+  if (!campaign) throw new ApiError(404, "Campaign not found");
 
   res.status(200).json(new ApiResponse(200, campaign, "Campaign status updated successfully"));
 });
